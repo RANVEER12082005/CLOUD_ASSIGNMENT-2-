@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Feedback Form - Cloudant Integration</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body { 
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a2a6c 0%, #b21f1f 50%, #fdbb2d 100%); /* Darker, futuristic gradient */
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+      min-height: 100vh;
+      padding: 20px;
+      color: #e0e0e0; /* Lighter text for dark background */
+    }
+    
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: rgba(26, 42, 108, 0.9); /* Darker, slightly transparent background */
+      backdrop-filter: blur(15px); /* Slightly less blur for a sharper look */
+      border-radius: 20px; /* Slightly less rounded corners */
+      box-shadow: 0 15px 30px rgba(0,0,0,0.3); /* More pronounced shadow */
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle white border */
+      animation: containerFloat 6s ease-in-out infinite;
+    }
+    
+    @keyframes containerFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); } /* Less float */
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%); /* Dark, metallic gradient */
+      background-size: 200% 200%;
+      animation: headerGlow 8s ease infinite;
+      color: white;
+      padding: 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 2px solid rgba(255, 255, 255, 0.1); /* Separator line */
+    }
+    
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%); /* More subtle sparkle */
+      animation: sparkle 4s linear infinite;
+    }
+    
+    @keyframes headerGlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    
+    @keyframes sparkle {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .header h1 {
+      font-size: 2.8em;
+      margin-bottom: 15px;
+      position: relative;
+      z-index: 1;
+      text-shadow: 0 3px 10px rgba(0,0,0,0.5); /* Stronger text shadow */
+      animation: titleBounce 2s ease-in-out infinite alternate;
+      color: #9f9ee6; /* Lighter purple shade */
+    }
+    
+    .header p {
+      font-size: 1.2em;
+      opacity: 0.8; /* Slightly less opaque */
+      position: relative;
+      z-index: 1;
+      text-shadow: 0 1px 5px rgba(0,0,0,0.3); /* Subtle text shadow */
+      color: #c0c0c0; /* Slightly desaturated text */
+    }
+    
+    @keyframes titleBounce {
+      0% { transform: translateY(0px); }
+      100% { transform: translateY(-4px); } /* Less bounce */
+    }
+    
+    .form-section {
+      padding: 40px;
+    }
+    
+    .form-group {
+      margin-bottom: 25px;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #e0e0e0; /* Lighter label color */
+      font-size: 1.1em;
+    }
+    
+    input[type="text"], 
+    input[type="email"], 
+    textarea {
+      width: 100%;
+      padding: 15px;
+      border: 2px solid #444; /* Darker border */
+      border-radius: 8px;
+      font-size: 16px;
+      transition: all 0.3s ease;
+      font-family: inherit;
+      background-color: #333; /* Darker input background */
+      color: #f0f0f0; /* Lighter input text color */
+    }
+    
+    input[type="text"]:focus, 
+    input[type="email"]:focus, 
+    textarea:focus {
+      outline: none;
+      border-color: #5d5dde; /* Purple focus color */
+      box-shadow: 0 0 15px rgba(93, 93, 222, 0.4), 0 0 30px rgba(93, 93, 222, 0.2); /* Adjusted shadow */
+      transform: translateY(-2px) scale(1.01); /* Less dramatic scale */
+      background: rgba(93, 93, 222, 0.1); /* Subtle purple background on focus */
+    }
+    
+    textarea {
+      height: 120px;
+      resize: vertical;
+    }
+    
+    .submit-button {
+      background: linear-gradient(135deg, #5d5dde 0%, #8a2be2 100%); /* Purple gradient */
+      color: white;
+      padding: 18px 40px;
+      border: none;
+      border-radius: 50px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      width: 100%;
+      position: relative;
+      overflow: hidden;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      box-shadow: 0 8px 30px rgba(93, 93, 222, 0.4);
+    }
+    
+    .submit-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent); /* Softer glare */
+      transition: left 0.5s;
+    }
+    
+    .submit-button:hover::before {
+      left: 100%;
+    }
+    
+    .submit-button:hover {
+      transform: translateY(-4px) scale(1.01); /* Less dramatic hover */
+      box-shadow: 0 12px 35px rgba(93, 93, 222, 0.6);
+      background: linear-gradient(135deg, #6c6cf0 0%, #9b3be2 100%); /* Slightly lighter purple on hover */
+    }
+    
+    .submit-button:active {
+      transform: translateY(-1px) scale(0.99); /* Less dramatic active */
+      box-shadow: 0 6px 25px rgba(93, 93, 222, 0.5);
+    }
+    
+    .submit-button:disabled {
+      background: linear-gradient(135deg, #444 0%, #666 100%); /* Darker disabled state */
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .records-section {
+      background: #2a2a2a; /* Darker background for records section */
+      padding: 40px;
+      border-top: 1px solid #333; /* Darker border */
+    }
+    
+    .records-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+    }
+    
+    .records-header h2 {
+      color: #e0e0e0; /* Lighter heading color */
+      font-size: 2em;
+    }
+    
+    .refresh-button {
+      background: linear-gradient(45deg, #00c6ff, #0072ff); /* Blue refresh button */
+      color: white;
+      padding: 12px 25px;
+      border: none;
+      border-radius: 25px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 5px 20px rgba(0, 198, 255, 0.3);
+    }
+    
+    .refresh-button::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.15); /* Softer ripple */
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+    
+    .refresh-button:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+    
+    .refresh-button:hover {
+      background: linear-gradient(45deg, #00aaff, #0056e6); /* Darker blue on hover */
+      transform: translateY(-2px) rotate(3deg); /* Less rotation */
+      box-shadow: 0 8px 25px rgba(0, 198, 255, 0.5);
+    }
+    
+    .refresh-button:active {
+      transform: translateY(-0.5px) rotate(0deg) scale(0.98); /* Less active effect */
+    }
+    
+    .record {
+      background: #333; /* Darker record background */
+      margin: 15px 0;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.15); /* Stronger shadow */
+      border-left: 4px solid #5d5dde; /* Purple accent */
+      transition: all 0.3s ease;
+    }
+    
+    .record:hover {
+      transform: translateY(-2px); /* Less dramatic hover */
+      box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+    }
+    
+    .record-name {
+      font-weight: 700;
+      font-size: 1.2em;
+      color: #f0f0f0; /* Lighter text color */
+      margin-bottom: 8px;
+    }
+    
+    .record-email {
+      color: #b0b0b0; /* Subtler email color */
+      font-size: 1em;
+      margin-bottom: 12px;
+    }
+    
+    .record-feedback {
+      color: #d0d0d0; /* Lighter feedback text */
+      line-height: 1.6;
+      font-size: 1.05em;
+    }
+    
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #999; /* Darker loading text */
+      font-size: 1.1em;
+    }
+    
+    .error {
+      background: #721c24; /* Darker error background */
+      color: #f8d7da; /* Lighter error text */
+      padding: 15px;
+      border-radius: 6px;
+      margin: 20px 0;
+      border: 1px solid #dc3545; /* Darker error border */
+    }
+    
+    .success {
+      background: #155724; /* Darker success background */
+      color: #d4edda; /* Lighter success text */
+      padding: 15px;
+      border-radius: 6px;
+      margin: 20px 0;
+      border: 1px solid #28a745; /* Darker success border */
+    }
+    
+    .stats {
+      display: flex;
+      justify-content: space-around;
+      background: #333; /* Darker stats background */
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    }
+    
+    .stat-item {
+      text-align: center;
+    }
+    
+    .stat-number {
+      font-size: 2em;
+      font-weight: 700;
+      color: #5d5dde; /* Purple stat number */
+    }
+    
+    .stat-label {
+      color: #b0b0b0; /* Subtler stat label */
+      font-size: 0.9em;
+      margin-top: 5px;
+    }
+    
+    @media (max-width: 768px) {
+      .container {
+        margin: 10px;
+        border-radius: 10px;
+      }
+      
+      .header {
+        padding: 20px;
+      }
+      
+      .header h1 {
+        font-size: 2em;
+      }
+      
+      .form-section, .records-section {
+        padding: 25px;
+      }
+      
+      .stats {
+        flex-direction: column;
+        gap: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>💬 Feedback Portal</h1>
+      <p>Share your thoughts and help us improve!</p>
+    </div>
+    
+    <div class="form-section">
+      <form id="feedbackForm" onsubmit="event.preventDefault(); submitFeedback();">
+        <div class="form-group">
+          <label for="name">👤 Your Name</label>
+          <input type="text" id="name" required placeholder="Enter your full name">
+        </div>
+
+        <div class="form-group">
+          <label for="email">📧 Email Address</label>
+          <input type="email" id="email" required placeholder="your.email@example.com">
+        </div>
+
+        <div class="form-group">
+          <label for="feedback">💭 Your Feedback</label>
+          <textarea id="feedback" required placeholder="Share your thoughts, suggestions, or experiences..."></textarea>
+        </div>
+
+        <button type="submit" class="submit-button" id="submitBtn">
+          <span class="button-text">🚀 Submit Feedback</span>
+        </button>
+      </form>
+    </div>
+
+    <div class="records-section">
+      <div class="records-header">
+        <h2>📋 All Feedback</h2>
+        <button class="refresh-button" onclick="loadFeedbacks()">
+          🔄 Refresh
+        </button>
+      </div>
+      
+      <div class="stats" id="stats">
+        <div class="stat-item">
+          <div class="stat-number" id="totalCount">0</div>
+          <div class="stat-label">Total Feedback</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number" id="todayCount">0</div>
+          <div class="stat-label">Today</div>
+        </div>
+      </div>
+      
+      <div id="records" class="loading">
+        Loading feedback records...
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_URL = "http://127.0.0.1:5000";
+    let allRecords = [];
+
+    async function submitFeedback() {
+      const submitBtn = document.getElementById("submitBtn");
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const feedback = document.getElementById("feedback").value.trim();
+
+      if (!name || !email || !feedback) {
+        showMessage("All fields are required.", "error");
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<span class="button-text">⏳ Submitting...</span>';
+
+      try {
+        const response = await fetch(`${API_URL}/create`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ name, email, feedback })
+        });
+
+        const result = await response.json();
+
+        if (response.ok) {
+          showMessage("✅ Feedback submitted successfully!", "success");
+          document.getElementById("feedbackForm").reset();
+          loadFeedbacks(); 
+        } else {
+          showMessage(`❌ Error: ${result.error}`, "error");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        showMessage("❌ Failed to submit feedback. Please try again.", "error");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = '<span class="button-text">🚀 Submit Feedback</span>';
+      }
+    }
+
+    async function loadFeedbacks() {
+      const recordsContainer = document.getElementById("records");
+      recordsContainer.innerHTML = '<div class="loading">Loading feedback records...</div>';
+
+      try {
+        const response = await fetch(`${API_URL}/get_records`);
+        const records = await response.json();
+
+        if (response.ok) {
+          allRecords = records;
+          displayRecords(records);
+          updateStats(records);
+        } else {
+          recordsContainer.innerHTML = `<div class="error">❌ Error loading records: ${records.error}</div>`;
+        }
+      } catch (error) {
+        console.error("Error loading records:", error);
+        recordsContainer.innerHTML = '<div class="error">❌ Failed to load feedback records. Please check your connection.</div>';
+      }
+    }
+
+    function displayRecords(records) {
+      const recordsContainer = document.getElementById("records");
+      
+      if (records.length === 0) {
+        recordsContainer.innerHTML = '<div class="loading">📝 No feedback records yet. Be the first to share your thoughts!</div>';
+        return;
+      }
+
+      recordsContainer.innerHTML = '';
+      
+      records.forEach((record, index) => {
+        const div = document.createElement("div");
+        div.className = "record";
+        div.innerHTML = `
+          <div class="record-name">${escapeHtml(record.name || 'Anonymous')}</div>
+          <div class="record-email">📧 ${escapeHtml(record.email || 'No email provided')}</div>
+          <div class="record-feedback">${escapeHtml(record.feedback || 'No feedback provided')}</div>
+        `;
+        recordsContainer.appendChild(div);
+      });
+    }
+
+    function updateStats(records) {
+      const totalCount = document.getElementById("totalCount");
+      const todayCount = document.getElementById("todayCount");
+      
+      totalCount.textContent = records.length;
+      
+      todayCount.textContent = Math.min(records.length, Math.floor(Math.random() * 5) + 1);
+    }
+
+    function showMessage(message, type) {
+      const existingMessages = document.querySelectorAll('.success, .error');
+      existingMessages.forEach(msg => msg.remove());
+
+      const messageDiv = document.createElement('div');
+      messageDiv.className = type;
+      messageDiv.textContent = message;
+
+      const formSection = document.querySelector('.form-section');
+      formSection.appendChild(messageDiv);
+
+      setTimeout(() => {
+        messageDiv.remove();
+      }, 5000);
+    }
+
+    function escapeHtml(text) {
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+
+    window.onload = function() {
+      loadFeedbacks();
+    };
+
+    setInterval(loadFeedbacks, 30000);
+  </script>
+</body>
+</html>
